@@ -1,4 +1,4 @@
-package com.example.mydataapp; // Sesuaikan dengan nama package Anda
+package com.example.mydataapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,13 +14,11 @@ import java.util.ArrayList;
 
 public class Dashboard extends AppCompatActivity {
 
-    // 1. Deklarasi Variabel
     private EditText etNim, etNama, etProdi, etKelas, etAlamat, etEmail;
     private Button btnTambahData, btnLogout;
     private ListView listViewData;
     private TextView tvWelcome;
 
-    // Variabel untuk menampung data di ListView
     private ArrayList<String> daftarData;
     private ArrayAdapter<String> adapter;
 
@@ -29,7 +27,6 @@ public class Dashboard extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        // 2. Hubungkan variabel dengan ID yang ada di XML
         tvWelcome = findViewById(R.id.tvWelcome);
         etNim = findViewById(R.id.etNim);
         etNama = findViewById(R.id.etNama);
@@ -41,54 +38,53 @@ public class Dashboard extends AppCompatActivity {
         btnLogout = findViewById(R.id.btnLogout);
         listViewData = findViewById(R.id.listViewData);
 
-        // Tampilkan pesan selamat datang dari SharedPreferences/Intent
-        SharedPreferences pref = getSharedPreferences("USER_LOG", MODE_PRIVATE);
-        String username = pref.getString("username", "Admin");
+        SharedPreferences pref = getSharedPreferences("MyDataApp", MODE_PRIVATE);
+        String username = pref.getString("namaUser", "Admin");
         tvWelcome.setText("Selamat Datang, " + username);
 
-        // 3. Setup ListView
         daftarData = new ArrayList<>();
-        // Gunakan layout sederhana bawaan android: simple_list_item_1
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, daftarData);
         listViewData.setAdapter(adapter);
 
-        // 4. Logika Tombol Tambah Data
         btnTambahData.setOnClickListener(v -> {
-            String nim = etNim.getText().toString();
-            String nama = etNama.getText().toString();
-            String prodi = etProdi.getText().toString();
-            String kelas = etKelas.getText().toString();
-            String alamat = etAlamat.getText().toString();
-            String email = etEmail.getText().toString();
+            String nim = etNim.getText().toString().trim();
+            String nama = etNama.getText().toString().trim();
+            String prodi = etProdi.getText().toString().trim();
+            String kelas = etKelas.getText().toString().trim();
+            String alamat = etAlamat.getText().toString().trim();
+            String email = etEmail.getText().toString().trim();
 
-            // Validasi: NIM dan Nama minimal harus diisi
-            if (!nim.isEmpty() && !nama.isEmpty()) {
-                // Gabungkan semua data menjadi satu teks untuk satu baris list
-                String gabungData = "NIM: " + nim + "\nNama: " + nama + "\nProdi: " + prodi +
-                        "\nKelas: " + kelas + "\nAlamat: " + alamat + "\nEmail: " + email;
-
-                // Masukkan ke dalam list
-                daftarData.add(gabungData);
-
-                // BERITAHU ADAPTER BAHWA ADA DATA BARU (Sangat Penting!)
-                adapter.notifyDataSetChanged();
-
-                // Bersihkan form input setelah klik tambah
-                bersihkanForm();
-                Toast.makeText(this, "Data Berhasil Ditambahkan", Toast.LENGTH_SHORT).show();
-            } else {
+            if (nim.isEmpty() || nama.isEmpty()) {
                 Toast.makeText(this, "NIM dan Nama tidak boleh kosong!", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            if (!nim.matches("[0-9]+")) {
+                etNim.setError("NIM harus berupa angka saja!");
+                Toast.makeText(this, "NIM Invalid: Tidak boleh ada huruf", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!nama.matches("[a-zA-Z\\s]+")) {
+                etNama.setError("Nama harus berupa huruf saja!");
+                Toast.makeText(this, "Nama Invalid: Tidak boleh ada angka", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String gabungData = "NIM: " + nim + "\nNama: " + nama + "\nProdi: " + prodi +
+                    "\nKelas: " + kelas + "\nAlamat: " + alamat + "\nEmail: " + email;
+
+            daftarData.add(gabungData);
+            adapter.notifyDataSetChanged();
+            bersihkanForm();
+            Toast.makeText(this, "Data Berhasil Ditambahkan", Toast.LENGTH_SHORT).show();
         });
 
-        // 5. Logika Tombol Logout
         btnLogout.setOnClickListener(v -> {
-            // Ubah status isLoggedIn menjadi false
             SharedPreferences.Editor editor = pref.edit();
             editor.putBoolean("isLoggedIn", false);
             editor.apply();
 
-            // Pindah ke halaman Login (MainActivity)
             Intent intent = new Intent(Dashboard.this, MainActivity.class);
             startActivity(intent);
             finish();

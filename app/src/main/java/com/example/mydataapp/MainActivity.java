@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("MyDataApp", MODE_PRIVATE);
 
         if (sharedPreferences.getBoolean("isLoggedIn", false)) {
-            startActivity(new Intent(MainActivity.this, DashboardActivity.class));
+            startActivity(new Intent(MainActivity.this, Dashboard.class));
             finish();
         }
 
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.putBoolean("isLoggedIn", true);
                 editor.apply();
 
-                Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
+                Intent intent = new Intent(MainActivity.this, Dashboard.class);
                 startActivity(intent);
                 finish();
             } else {
